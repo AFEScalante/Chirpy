@@ -23,6 +23,8 @@ func main() {
 		Handler: mux,
 	}
 	
-	fmt.Println("Server running on http://localhost:8080")
-	server.ListenAndServe()
+	fmt.Printf("Server running on http://localhost:%s\n", port)
+	if err := server.ListenAndServe(); err != nil {
+		panic(err)
+	}
 }
