@@ -9,11 +9,14 @@ type Server struct{}
 
 func main() {
 	port := "8080"
-	filepathRoot := "."
-
 	mux := http.NewServeMux()
-	handler := http.FileServer(http.Dir(filepathRoot))
-	mux.Handle("/", handler)
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		http.ServeFile(w, r, "index.html")
+	})
 
 	server := &http.Server{
 		Addr: ":" + port,
