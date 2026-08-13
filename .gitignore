@@ -1,0 +1,27 @@
+# Binaries
+/chirpy
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of go build
+out/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Go module download cache
+vendor/
+
+# Environment variables
+.env
+
+# OS-specific files
+.DS_Store
+Thumbs.db
