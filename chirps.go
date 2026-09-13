@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/AFEScalante/Chirpy/internal/auth"
 	"github.com/AFEScalante/Chirpy/internal/database"
 	"github.com/google/uuid"
 )
@@ -46,8 +47,22 @@ func validateChirps(w http.ResponseWriter, r *http.Request) parameters {
 }
 
 func (cfg *apiConfig) handlerCreateChirps(w http.ResponseWriter, r *http.Request) {
+	headers := r.Header
+	token, err := auth.GetBearerToken(headers)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", err)
+		return
+	}
+
+	userId, err := auth.ValidateJWT(token, cfg.jwtSecret)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", err)
+		return
+	}
+
 	params := validateChirps(w, r)
 	if params.Body == "" {
+		respondWithError(w, http.StatusBadRequest, "Chirp body is required", nil)
 		return
 	}
 
@@ -56,7 +71,7 @@ func (cfg *apiConfig) handlerCreateChirps(w http.ResponseWriter, r *http.Request
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 		Body:      params.Body,
-		UserID:    uuid.MustParse(params.UserID),
+		UserID:    userId,
 	}
 	createdChirp, err := cfg.db.CreateChirp(r.Context(), newChirpParams)
 	if err != nil {
